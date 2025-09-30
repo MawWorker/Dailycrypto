@@ -1,0 +1,381 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:is(.dark *));
+
+/* Design tokens */
+:root { 
+  --surface-0: #ffffff; 
+  --ring-color: #2563eb; 
+  --ring-offset: #ffffff;
+  --header-py: 14px;
+}
+
+@media (max-width: 640px) {
+  :root { 
+    --header-py: 12px;
+  }
+}
+
+.dark { 
+  --surface-0: #0f172a; 
+  --ring-color: #60a5fa; 
+  --ring-offset: #0f172a; 
+}
+
+@theme {
+  /* Shadcn/UI Base Colors */
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #0a0a0a;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0a0a0a;
+
+  --color-primary: #171717;
+  --color-primary-foreground: #fafafa;
+
+  --color-secondary: #f5f5f5;
+  --color-secondary-foreground: #171717;
+
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #737373;
+
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #171717;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #fafafa;
+
+  --color-border: #e5e5e5;
+  --color-input: #e5e5e5;
+  --color-ring: #0a0a0a;
+
+  --color-chart-1: #e67e22;
+  --color-chart-2: #2d8659;
+  --color-chart-3: #1e3a5f;
+  --color-chart-4: #f1c40f;
+  --color-chart-5: #e74c3c;
+
+  --color-sidebar: #f7f7f7;
+  --color-sidebar-foreground: #404040;
+  --color-sidebar-primary: #1a1a1a;
+  --color-sidebar-primary-foreground: #fafafa;
+  --color-sidebar-accent: #f0f0f0;
+  --color-sidebar-accent-foreground: #1a1a1a;
+  --color-sidebar-border: #d4d4d8;
+  --color-sidebar-ring: #3b82f6;
+
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+
+  /* CryptoPress Philippines Design System Colors */
+  --color-primary-brand: #2563eb; /* Royal Blue */
+  --color-secondary-brand: #475569; /* Slate 600 */
+  --color-background-site: #ffffff; /* White */
+  --color-surface: #f8fafc; /* Slate 50 */
+  --color-muted-subtle: #f1f5f9; /* Slate 100 */
+  --color-text-primary: #0f172a; /* Slate 900 */
+  --color-text-secondary: #475569; /* Slate 600 */
+  --color-success: #10b981; /* Emerald 500 */
+
+  /* Section above footer (AvatarCenteredCta) Variables */
+  --color-secondary-brand: #475569; /* Slate 600 */
+
+  /* CryptoPress Philippines Design System Fonts */
+  --font-display: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+
+/* --- DailyCrypto: article rhythm ------------------------------ */
+@layer components {
+  .dc-article > * + * { margin-top: 1rem; }
+
+  /* Headings scale + spacing */
+  .dc-article h1 { font-size: clamp(1.875rem, 3vw, 2.25rem); line-height: 1.2; margin-top: 0; margin-bottom: .75rem; font-weight: 800; }
+  .dc-article h2 { font-size: clamp(1.375rem, 2.2vw, 1.75rem); line-height: 1.3; margin-top: 2.25rem; margin-bottom: .75rem; font-weight: 800; }
+  .dc-article h3 { font-size: clamp(1.125rem, 1.8vw, 1.375rem); line-height: 1.35; margin-top: 1.5rem; margin-bottom: .5rem; font-weight: 700; }
+
+  /* Paragraphs & lists */
+  .dc-article p { margin-top: .85rem; }
+  .dc-article ul, .dc-article ol { margin-top: 1rem; margin-bottom: 1rem; padding-left: 1.25rem; }
+  .dc-article ul { list-style: disc; }
+  .dc-article ol { list-style: decimal; }
+  .dc-article li { margin-top: .4rem; }
+  .dc-article strong { font-weight: 700; }
+
+  /* Separators & misc */
+  .dc-article hr { margin: 2rem 0; border-color: rgb(226 232 240 / .5); }
+  .dc-article img { border-radius: .75rem; }
+}
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border);
+  }
+}
+
+@layer utilities {
+  body {
+    font-family: var(--font-body);
+  }
+}
+
+@layer base {
+  :root {
+    /* Shadcn/UI Compatibility */
+    --background: var(--color-background-site);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-background-site);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-primary-brand);
+    --primary-foreground: #fafafa; /* Keeping light for royal blue contrast */
+    --secondary: var(--color-muted-subtle);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-muted-subtle);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-muted-subtle);
+    --accent-foreground: var(--color-text-primary);
+    --destructive: #ef4444; /* Standard red for destructive actions */
+    --destructive-foreground: #fafafa;
+    --border: var(--color-muted-subtle);
+    --input: var(--color-muted-subtle);
+    --ring: var(--color-primary-brand);
+
+    /* Chart colors remain standard for now as no specific design system charts provided */
+    --chart-1: #e67e22;
+    --chart-2: #2d8659;
+    --chart-3: #1e3a5f;
+    --chart-4: #f1c40f;
+    --chart-5: #e74c3c;
+
+    --radius: var(--radius-md); /* Default radius for shadcn components */
+
+    /* Sidebar colors based on general palette as no specific sidebar design provided */
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-text-primary);
+    --sidebar-primary: var(--color-primary-brand);
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: var(--color-muted-subtle);
+    --sidebar-accent-foreground: var(--color-text-primary);
+    --sidebar-border: var(--color-muted-subtle);
+    --sidebar-ring: var(--color-primary-brand);
+
+    /* Market Analysis & Insights Section Variables */
+    --color-primary-brand: #2563eb; /* Royal Blue */
+    --color-background-site: #ffffff; /* White */
+    --color-surface: #f8fafc; /* Slate 50 */
+    --color-muted-subtle: #f1f5f9; /* Slate 100 */
+    --color-text-primary: #0f172a; /* Slate 900 */
+    --color-text-secondary: #475569; /* Slate 600 */
+  }
+
+  .dark {
+    /* Dark Mode Color Overrides */
+    --color-background-site: #0f172a; /* Slate 900 */
+    --color-surface: #1e293b; /* Slate 800 */
+    --color-muted-subtle: #334155; /* Slate 700 */
+    --color-text-primary: #f8fafc; /* Slate 50 */
+    --color-text-secondary: #cbd5e1; /* Slate 300 */
+    --color-primary-brand: #3b82f6; /* Brighter blue for dark mode */
+
+    /* Shadcn/UI Dark Mode Variables */
+    --background: var(--color-background-site);
+    --foreground: var(--color-text-primary);
+    --card: var(--color-surface);
+    --card-foreground: var(--color-text-primary);
+    --popover: var(--color-surface);
+    --popover-foreground: var(--color-text-primary);
+    --primary: var(--color-primary-brand);
+    --primary-foreground: #0f172a;
+    --secondary: var(--color-muted-subtle);
+    --secondary-foreground: var(--color-text-primary);
+    --muted: var(--color-muted-subtle);
+    --muted-foreground: var(--color-text-secondary);
+    --accent: var(--color-muted-subtle);
+    --accent-foreground: var(--color-text-primary);
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: var(--color-muted-subtle);
+    --input: var(--color-muted-subtle);
+    --ring: var(--color-primary-brand);
+
+    /* Sidebar dark mode colors */
+    --sidebar-background: var(--color-surface);
+    --sidebar-foreground: var(--color-text-primary);
+    --sidebar-primary: var(--color-primary-brand);
+    --sidebar-primary-foreground: #0f172a;
+    --sidebar-accent: var(--color-muted-subtle);
+    --sidebar-accent-foreground: var(--color-text-primary);
+    --sidebar-border: var(--color-muted-subtle);
+    --sidebar-ring: var(--color-primary-brand);
+
+    /* Market Analysis & Insights Section Dark Mode Variables */
+    --color-background-site: #0f172a; /* Slate 900 */
+    --color-surface: #1e293b; /* Slate 800 */
+    --color-muted-subtle: #334155; /* Slate 700 */
+    --color-text-primary: #f8fafc; /* Slate 50 */
+    --color-text-secondary: #cbd5e1; /* Slate 300 */
+    --color-primary-brand: #3b82f6; /* Brighter blue for dark mode */
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--color-text-primary);
+    margin-bottom: 0.5em;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+  }
+
+  h1 {
+    font-size: 3rem; /* Approximates 48px */
+    font-weight: 900;
+  }
+
+  h2 {
+    font-size: 2.25rem; /* Approximates 32px */
+    font-weight: 800;
+  }
+
+  h3 {
+    font-size: 1.5rem; /* Approximates 24px */
+    font-weight: 700;
+  }
+
+  h4 {
+    font-size: 1.25rem; /* Approximates 20px */
+    font-weight: 700;
+  }
+
+  h5 {
+    font-size: 1.125rem; /* Approximates 18px */
+    font-weight: 600;
+  }
+
+  h6 {
+    font-size: 1rem; /* Approximates 16px */
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 1rem; /* Approximates 16px */
+    margin-bottom: 1em;
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
+  }
+
+  a {
+    color: var(--color-primary-brand);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  .container {
+    margin-inline: auto;
+    padding-inline: 2rem;
+    max-width: 90rem; /* Example max-width for a wide magazine-style layout */
+  }
+
+  /* Scroll-to-top button animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in-from-bottom-2 {
+    from {
+      transform: translateY(8px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .fade-in {
+    animation-name: fade-in;
+  }
+
+  .slide-in-from-bottom-2 {
+    animation-name: slide-in-from-bottom-2;
+  }
+
+  .duration-300 {
+    animation-duration: 300ms;
+  }
+}

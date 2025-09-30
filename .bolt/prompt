@@ -1,0 +1,209 @@
+For all designs I ask you to make, have them be beautiful, not cookie cutter. Make webpages that are fully featured and worthy for production.
+
+When using client-side hooks (useState and useEffect) in a component that's being treated as a Server Component by Next.js, always add the "use client" directive at the top of the file.
+
+Do not write code that will trigger this error: "Warning: Extra attributes from the server: %s%s""class,style"
+
+By default, this template supports JSX syntax with Tailwind CSS classes, the shadcn/ui library, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.
+
+Use icons from lucide-react for logos.
+
+DailyCrypto.ph – Project Knowledge (Architecture & Integration Rules)
+Core stack
+
+Next.js (App Router, TypeScript, Tailwind) with strict mode.
+
+Contentful for all editorial content (news, pages, authors, categories).
+
+Cloudinary for image storage/delivery and on-the-fly transforms.
+
+Make.com for automations (publish webhooks → revalidate/build, social syndication, etc.).
+
+Design: reuse the site’s existing card shell (rounded-2xl, subtle border, soft shadow, light/dark support) and spacing (gap-6) for every new UI block.
+
+Code organization (no spaghetti)
+
+Use a lightweight, feature-oriented structure:
+
+src/
+  app/
+    (site)/
+      page.tsx
+      news/
+        page.tsx              // listing w/ pagination
+        [slug]/
+          page.tsx            // article
+      category/
+        [slug]/
+          page.tsx
+      api/
+        revalidate/route.ts   // webhook handler (Make/Contentful)
+    layout.tsx
+  components/
+    common/                   // generic UI (cards, buttons, layout primitives)
+    news/                     // news-specific components (lists, item cards, hero blocks)
+  lib/
+    contentful.ts             // Contentful client & typed queries
+    cloudinary.ts             // Cloudinary loader/helpers
+    mapper.ts                 // map CMS → view models (Article, Author, Category)
+    seo.ts                    // metadata helpers (OpenGraph, Twitter)
+  services/
+    news.ts                   // composable fetchers that return typed models
+  styles/
+    globals.css
+
+
+Conventions
+
+TypeScript strict; add Zod schemas (or generated types) at the edge of the system (CMS responses) and map to internal view models—never pass raw CMS JSON to components.
+
+Server work in Server Components/route handlers; Client Components only for interactivity. Never accept ({ searchParams }) in a client page—use useSearchParams() or a server wrapper → client child pattern.
+
+One source of truth per feature (e.g., services/news.ts calls lib/contentful.ts, maps via lib/mapper.ts, returns typed models).
+
+Keep styling via Tailwind utility tokens already used across the site; do not hard-code ad-hoc colors or spacing.
+
+Contentful (CMS)
+
+Models
+
+Article: title, slug, excerpt, body (Rich Text), heroImage (asset), author (ref), category (ref), tags (array), publishedAt (date), seoTitle/seoDescription (optional), status (draft/published), locale (optional).
+
+Author: name, slug, avatar, bio, socials.
+
+Category: name, slug, description.
+
+SitePage (optional): for static pages.
+
+Access
+
+Use Delivery (CDA) for prod; Preview (CPA) for draft preview.
+
+Prefer GraphQL or the JS SDK centrally in lib/contentful.ts.
+
+lib/contentful.ts
+
+Export a singleton client + helpers: getArticles, getArticleBySlug, getCategories, with revalidate hints (ISR) and error-safe defaults.
+
+Add optional preview boolean to switch tokens/hosts.
+
+Rendering
+
+Convert Rich Text → React with a renderer (links open new tab when external; generate heading anchors).
+
+Sanitize/whitelist embeds.
+
+Map assets to Cloudinary URLs when asset is migrated; else use Next/Image fallback.
+
+Routing & ISR
+
+news/page.tsx: server component, paginated; generateStaticParams for categories; revalidate (e.g., 60–300s).
+
+news/[slug]/page.tsx: server component, generateMetadata via article fields; revalidate: 60 (tune).
+
+Add /sitemap.xml, /rss.xml from services/news.ts.
+
+Env
+
+CONTENTFUL_SPACE_ID
+
+CONTENTFUL_DELIVERY_TOKEN
+
+CONTENTFUL_PREVIEW_TOKEN
+
+CONTENTFUL_ENVIRONMENT (usually master)
+
+Cloudinary (images)
+
+Add a custom Next.js Image loader in lib/cloudinary.ts:
+
+Respect DPR & width; default format = auto, quality = auto, add transformations for cover/contain, blur-up placeholders.
+
+All images use next/image with the Cloudinary loader, responsive sizes, and intrinsic aspect ratio (from CMS metadata).
+
+Global defaults: rounded corners to match card shell; dark mode safe overlays when applicable.
+
+Env
+
+CLOUDINARY_CLOUD_NAME
+
+CLOUDINARY_DELIVERY_BASE (optional, else derive)
+
+(If using signed URLs) CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+
+Make.com (automation)
+
+Outbound (Contentful → Make → site):
+
+Contentful webhook on publish/update/unpublish → Make scenario.
+
+Make calls /api/revalidate (POST) with a secret and payload { type: "article" | "category", slug }.
+
+In app/api/revalidate/route.ts:
+
+Verify secret (X-Webhook-Secret or query secret).
+
+Call res.revalidatePath('/news') and res.revalidatePath('/news/[slug]') as needed.
+
+Return JSON { revalidated: true }.
+
+Inbound (site → Make):
+
+Optional: newsletter signup or contact endpoints that POST to Make Webhook URL. Validate and rate-limit.
+
+Env
+
+MAKE_REVALIDATE_SECRET
+
+SEO & performance
+
+lib/seo.ts helpers for generateMetadata (title template, OG image from Cloudinary, canonical URLs).
+
+Structured data (Article/NewsArticle JSON-LD) on article pages.
+
+Maintain Core Web Vitals: next/script for third-party, lazy load embeds, image placeholders, avoid layout shift.
+
+Acceptance criteria for new code/tasks
+
+Uses services → lib → components flow (no direct CMS calls in components).
+
+Type-safe from fetch → UI (either generated types or Zod).
+
+All images via Cloudinary loader; responsive sizes.
+
+New components reuse the card shell & spacing (gap-6), align with hamburger container (mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8).
+
+Server pages handle searchParams correctly (server wrapper or useSearchParams in client).
+
+Includes dark mode classes matching existing design.
+
+No hard-coded secrets; all config via env.
+
+Example env block (for .env.local)
+# Contentful
+CONTENTFUL_SPACE_ID=xxx
+CONTENTFUL_DELIVERY_TOKEN=xxx
+CONTENTFUL_PREVIEW_TOKEN=xxx
+CONTENTFUL_ENVIRONMENT=master
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=xxx
+# If using a custom base: https://res.cloudinary.com/<cloud_name>/image/upload/
+CLOUDINARY_DELIVERY_BASE=https://res.cloudinary.com/xxx/image/upload/
+
+# Make.com
+MAKE_REVALIDATE_SECRET=supersecret
+
+Quick “getting started” tasks for Bolt
+
+Create lib/contentful.ts (singleton client + typed fetchers; preview switch).
+
+Create lib/cloudinary.ts (Next/Image loader + helper clUrl(publicId, transforms)).
+
+Create services/news.ts (list, bySlug, byCategory) returning mapped view models.
+
+Wire app/news/page.tsx and app/news/[slug]/page.tsx as server components with ISR.
+
+Add app/api/revalidate/route.ts for Make.com webhook.
+
+Ensure all images in news list & article pages use the Cloudinary loader.
