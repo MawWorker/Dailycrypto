@@ -41,7 +41,7 @@ export function getImageUrl(source: any, fallback: string = ''): string {
 }
 
 export async function getNewsPosts(limit?: number) {
-  const query = `*[_type == "newsPost"] | order(datePublished desc) ${limit ? `[0...${limit}]` : ''} {
+  const query = `*[_type == "newsPost" && !(_id in path("drafts.**"))] | order(datePublished desc) ${limit ? `[0...${limit}]` : ''} {
     _id,
     title,
     slug,
@@ -68,12 +68,19 @@ export async function getNewsPosts(limit?: number) {
   }`
 
   try {
+    console.log('Fetching from Sanity with config:', {
+      projectId: client.config().projectId,
+      dataset: client.config().dataset,
+    })
     const result = await client.fetch(query, {}, { next: { revalidate: 60 } })
     console.log('Sanity fetch successful, posts:', result?.length || 0)
+    if (result && result.length > 0) {
+      console.log('First post:', result[0].title)
+    }
     return result
   } catch (error) {
     console.error('Sanity fetch error:', error)
-    return []
+    throw error
   }
 }
 

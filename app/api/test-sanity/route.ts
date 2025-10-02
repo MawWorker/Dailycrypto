@@ -10,14 +10,32 @@ export async function GET() {
       hasToken: !!process.env.SANITY_API_READ_TOKEN,
     };
 
-    const query = '*[_type == "newsPost"][0...5]{ _id, title, slug }';
-    const posts = await client.fetch(query);
+    const allQuery = '*[_type == "newsPost"]{ _id, title, slug }';
+    const publishedQuery = '*[_type == "newsPost" && !(_id in path("drafts.**"))]{ _id, title, slug }';
+
+    const allPosts = await client.fetch(allQuery);
+    const publishedPosts = await client.fetch(publishedQuery);
+
+    const authorQuery = '*[_type == "author"]{ _id, name }';
+    const categoryQuery = '*[_type == "category"]{ _id, name }';
+
+    const authors = await client.fetch(authorQuery);
+    const categories = await client.fetch(categoryQuery);
 
     return NextResponse.json({
       success: true,
       config,
-      postsCount: posts?.length || 0,
-      posts: posts || [],
+      counts: {
+        allPosts: allPosts?.length || 0,
+        publishedPosts: publishedPosts?.length || 0,
+        drafts: (allPosts?.length || 0) - (publishedPosts?.length || 0),
+        authors: authors?.length || 0,
+        categories: categories?.length || 0,
+      },
+      allPosts: allPosts || [],
+      publishedPosts: publishedPosts || [],
+      authors: authors || [],
+      categories: categories || [],
     });
   } catch (error: any) {
     return NextResponse.json({
