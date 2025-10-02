@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { AnimatedIndicatorNavbar } from '@/components/navbars/animated-indicator-navbar'
 import { NewsletterFooter } from '@/components/footers/newsletter-footer'
 import MarketTicker from '@/components/crypto/market-ticker'
-import { getNewsPostBySlug, getAllNewsPostSlugs, getNewsPosts, urlFor } from '@/lib/sanity'
+import { getNewsPostBySlug, getAllNewsPostSlugs, getNewsPosts, getImageUrl } from '@/lib/sanity'
 import PortableTextRenderer from '@/components/article/PortableTextRenderer'
 
 interface ArticlePageProps {
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
     openGraph: {
       title: article.title,
       description: article.excerpt || article.description,
-      images: [urlFor(article.coverImage).width(1200).height(630).url()],
+      images: [getImageUrl(article.coverImage, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')],
       type: 'article',
       publishedTime: article.datePublished,
       modifiedTime: article.dateModified,
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       card: 'summary_large_image',
       title: article.title,
       description: article.excerpt || article.description,
-      images: [urlFor(article.coverImage).width(1200).height(630).url()],
+      images: [getImageUrl(article.coverImage, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')],
     }
   }
 }
@@ -182,7 +182,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
           <div className="relative aspect-video rounded-xl overflow-hidden bg-muted shadow-sm">
             <Image
-              src={urlFor(article.coverImage).width(1200).height(675).url()}
+              src={getImageUrl(article.coverImage, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')}
               alt={article.title}
               fill
               className="object-cover transition-transform duration-300 hover:scale-105"
@@ -216,7 +216,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 {article.author.avatar && (
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-muted flex-shrink-0 shadow-sm">
                     <Image
-                      src={urlFor(article.author.avatar).width(64).height(64).url()}
+                      src={getImageUrl(article.author.avatar, 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg')}
                       alt={article.author.name}
                       fill
                       className="object-cover"
@@ -261,7 +261,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   <Card key={relatedArticle._id} className="group hover:shadow-md transition-shadow">
                     <div className="relative aspect-video rounded-t-xl overflow-hidden">
                       <Image
-                        src={urlFor(relatedArticle.coverImage).width(400).height(225).url()}
+                        src={getImageUrl(relatedArticle.coverImage, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')}
                         alt={relatedArticle.title}
                         fill
                         className="object-cover"
