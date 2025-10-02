@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { formatRelativeTime } from '@/lib/format';
 import { Clock, User } from 'lucide-react';
 import { getNewsPosts, getImageUrl } from '@/lib/sanity';
-import SanityDebug from '@/components/news/sanity-debug';
 
 export const metadata = {
   title: 'Crypto News Philippines',
@@ -17,9 +16,20 @@ export const metadata = {
 export default async function NewsPage() {
   let posts;
   let error = null;
+  let debugInfo: any = null;
 
   try {
     posts = await getNewsPosts();
+
+    const { client } = await import('@/lib/sanity');
+    const allPostsQuery = '*[_type == "newsPost"]{ _id, title }';
+    const allPosts = await client.fetch(allPostsQuery);
+
+    debugInfo = {
+      totalPosts: allPosts?.length || 0,
+      publishedPosts: posts?.length || 0,
+      sampleIds: allPosts?.slice(0, 3).map((p: any) => ({ id: p._id, title: p.title })) || [],
+    };
   } catch (e: any) {
     error = e.message;
     posts = [];
@@ -33,6 +43,7 @@ export default async function NewsPage() {
 
   console.log('News posts fetched:', posts?.length || 0);
   console.log('Sanity config:', sanityConfig);
+  console.log('Debug info:', debugInfo);
   if (error) console.error('Fetch error:', error);
 
   if (!posts || posts.length === 0) {
@@ -57,9 +68,12 @@ export default async function NewsPage() {
               <p className="font-semibold mb-2">Sanity Configuration:</p>
               <pre className="text-left">{JSON.stringify(sanityConfig, null, 2)}</pre>
             </div>
-            <div className="max-w-2xl mx-auto">
-              <SanityDebug />
-            </div>
+            {debugInfo && (
+              <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 p-4 rounded-lg max-w-2xl mx-auto border border-blue-200 dark:border-blue-800">
+                <p className="font-semibold mb-2 text-blue-700 dark:text-blue-300">Debug Information:</p>
+                <pre className="text-left">{JSON.stringify(debugInfo, null, 2)}</pre>
+              </div>
+            )}
           </div>
         </div>
       </div>
