@@ -66,7 +66,14 @@ export async function getNewsPosts(limit?: number) {
     language
   }`
 
-  return await client.fetch(query, {}, { next: { revalidate: 60 } })
+  try {
+    const result = await client.fetch(query, {}, { next: { revalidate: 60 } })
+    console.log('Sanity fetch successful, posts:', result?.length || 0)
+    return result
+  } catch (error) {
+    console.error('Sanity fetch error:', error)
+    return []
+  }
 }
 
 export async function getNewsPostBySlug(slug: string) {

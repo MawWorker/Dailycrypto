@@ -16,6 +16,12 @@ export const metadata = {
 export default async function NewsPage() {
   const posts = await getNewsPosts();
 
+  console.log('News posts fetched:', posts?.length || 0);
+  console.log('Sanity config:', {
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  });
+
   if (!posts || posts.length === 0) {
     return (
       <div className="container py-8 max-w-7xl mx-auto">
