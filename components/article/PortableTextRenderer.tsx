@@ -1,6 +1,6 @@
 import { PortableText, PortableTextComponents } from '@portabletext/react';
 import Image from 'next/image';
-import { urlFor } from '@/lib/sanity';
+import { getImageUrl } from '@/lib/sanity';
 
 const components: PortableTextComponents = {
   block: {
@@ -54,7 +54,7 @@ const components: PortableTextComponents = {
         <figure className="my-8">
           <div className="relative w-full aspect-video rounded-lg overflow-hidden">
             <Image
-              src={urlFor(value).width(1200).height(675).url()}
+              src={getImageUrl(value.asset, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')}
               alt={value.alt || 'Article image'}
               fill
               className="object-cover"

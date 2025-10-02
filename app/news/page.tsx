@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatRelativeTime } from '@/lib/format';
 import { Clock, User } from 'lucide-react';
-import { getNewsPosts, urlFor } from '@/lib/sanity';
+import { getNewsPosts, getImageUrl } from '@/lib/sanity';
 
 export const metadata = {
   title: 'Crypto News Philippines',
@@ -47,7 +47,7 @@ export default async function NewsPage() {
             <Card className="group h-full hover:shadow-lg transition-all duration-300 hover:border-brand-blue/50">
               <div className="aspect-[16/10] relative overflow-hidden">
                 <Image
-                  src={urlFor(post.coverImage).width(800).height(500).url()}
+                  src={getImageUrl(post.coverImage, 'https://images.pexels.com/photos/730547/pexels-photo-730547.jpeg')}
                   alt={post.title}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
