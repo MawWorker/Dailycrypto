@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { formatRelativeTime } from '@/lib/format';
 import { Clock, User } from 'lucide-react';
 import { getNewsPosts, getImageUrl } from '@/lib/sanity';
+import SanityDebug from '@/components/news/sanity-debug';
 
 export const metadata = {
   title: 'Crypto News Philippines',
@@ -14,13 +15,25 @@ export const metadata = {
 };
 
 export default async function NewsPage() {
-  const posts = await getNewsPosts();
+  let posts;
+  let error = null;
 
-  console.log('News posts fetched:', posts?.length || 0);
-  console.log('Sanity config:', {
+  try {
+    posts = await getNewsPosts();
+  } catch (e: any) {
+    error = e.message;
+    posts = [];
+  }
+
+  const sanityConfig = {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-  });
+    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
+  };
+
+  console.log('News posts fetched:', posts?.length || 0);
+  console.log('Sanity config:', sanityConfig);
+  if (error) console.error('Fetch error:', error);
 
   if (!posts || posts.length === 0) {
     return (
@@ -32,7 +45,22 @@ export default async function NewsPage() {
           </p>
         </div>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No articles published yet. Check back soon!</p>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">No articles published yet. Check back soon!</p>
+            {error && (
+              <div className="text-sm text-red-500 bg-red-50 dark:bg-red-950 p-4 rounded-lg max-w-2xl mx-auto">
+                <p className="font-semibold mb-1">Error fetching articles:</p>
+                <p className="font-mono">{error}</p>
+              </div>
+            )}
+            <div className="text-xs text-muted-foreground bg-muted p-4 rounded-lg max-w-2xl mx-auto">
+              <p className="font-semibold mb-2">Sanity Configuration:</p>
+              <pre className="text-left">{JSON.stringify(sanityConfig, null, 2)}</pre>
+            </div>
+            <div className="max-w-2xl mx-auto">
+              <SanityDebug />
+            </div>
+          </div>
         </div>
       </div>
     );
