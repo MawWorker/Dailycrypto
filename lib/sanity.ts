@@ -1,11 +1,128 @@
-@@ .. @@
- import { createClient } from 'next-sanity'
+import { createClient } from 'next-sanity'
+import imageUrlBuilder from '@sanity/image-url'
 
- export const client = createClient({
- }
- )
--  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
-+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
-   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-   apiVersion: '2024-01-01',
-   useCdn: false,
+export const client = createClient({
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+  apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
+  useCdn: false,
+  token: process.env.SANITY_API_READ_TOKEN,
+})
+
+const builder = imageUrlBuilder(client)
+
+export function urlFor(source: any) {
+  return builder.image(source)
+}
+
+export async function getNewsPosts(limit?: number) {
+  const query = `*[_type == "newsPost"] | order(datePublished desc) ${limit ? `[0...${limit}]` : ''} {
+    _id,
+    title,
+    slug,
+    description,
+    excerpt,
+    coverImage,
+    "author": author->{
+      name,
+      bio,
+      avatar
+    },
+    "category": category->name,
+    tags,
+    tickers,
+    datePublished,
+    dateModified,
+    readingTime,
+    featured,
+    premium,
+    exclusive,
+    contentType,
+    impact,
+    language
+  }`
+
+  return await client.fetch(query, {}, { next: { revalidate: 60 } })
+}
+
+export async function getNewsPostBySlug(slug: string) {
+  const query = `*[_type == "newsPost" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    description,
+    excerpt,
+    content,
+    coverImage,
+    "author": author->{
+      name,
+      bio,
+      avatar
+    },
+    "category": category->name,
+    tags,
+    tickers,
+    datePublished,
+    dateModified,
+    readingTime,
+    featured,
+    premium,
+    exclusive,
+    contentType,
+    impact,
+    language,
+    seo
+  }`
+
+  return await client.fetch(query, { slug }, { next: { revalidate: 60 } })
+}
+
+export async function getFeaturedNewsPosts(limit: number = 3) {
+  const query = `*[_type == "newsPost" && featured == true] | order(datePublished desc) [0...${limit}] {
+    _id,
+    title,
+    slug,
+    description,
+    excerpt,
+    coverImage,
+    "author": author->{
+      name,
+      bio,
+      avatar
+    },
+    "category": category->name,
+    tags,
+    datePublished,
+    readingTime,
+    featured
+  }`
+
+  return await client.fetch(query, {}, { next: { revalidate: 60 } })
+}
+
+export async function getNewsPostsByCategory(categoryName: string, limit?: number) {
+  const query = `*[_type == "newsPost" && category->name == $categoryName] | order(datePublished desc) ${limit ? `[0...${limit}]` : ''} {
+    _id,
+    title,
+    slug,
+    description,
+    excerpt,
+    coverImage,
+    "author": author->{
+      name,
+      bio,
+      avatar
+    },
+    "category": category->name,
+    tags,
+    datePublished,
+    readingTime
+  }`
+
+  return await client.fetch(query, { categoryName }, { next: { revalidate: 60 } })
+}
+
+export async function getAllNewsPostSlugs() {
+  const query = `*[_type == "newsPost"] { "slug": slug.current }`
+  return await client.fetch(query)
+}
