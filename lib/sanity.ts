@@ -12,7 +12,31 @@ export const client = createClient({
 const builder = imageUrlBuilder(client)
 
 export function urlFor(source: any) {
+  if (!source) return null
+
+  if (source.secure_url) {
+    return { url: () => source.secure_url }
+  }
+
+  if (source.url) {
+    return { url: () => source.url }
+  }
+
   return builder.image(source)
+}
+
+export function getImageUrl(source: any, fallback: string = ''): string {
+  if (!source) return fallback
+
+  if (source.secure_url) return source.secure_url
+  if (source.url) return source.url
+
+  try {
+    return builder.image(source).url()
+  } catch (error) {
+    console.error('Error building image URL:', error)
+    return fallback
+  }
 }
 
 export async function getNewsPosts(limit?: number) {
