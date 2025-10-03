@@ -10,36 +10,50 @@ import { NewsletterCTASection } from "@/components/home/newsletter-cta-section";
 import { TrendingTopicsSection } from "@/components/home/trending-topics-section";
 import { QuickStatsSection } from "@/components/home/quick-stats-section";
 import { useCryptoPrices } from "@/hooks/use-crypto-prices";
+import { mockNewsPosts } from "@/lib/content.mock";
 
-interface ClientHomePageProps {
-  featuredArticles: any[];
-  allArticles: any[];
-}
-
-export default function ClientHomePage({ featuredArticles, allArticles }: ClientHomePageProps) {
+export default function ClientHomePage() {
   const { data: priceTickers } = useCryptoPrices();
 
-  const transformedFeaturedArticle = featuredArticles[0] ? {
-    id: featuredArticles[0]._id,
-    title: featuredArticles[0].title,
-    excerpt: featuredArticles[0].excerpt || featuredArticles[0].description,
-    author: featuredArticles[0].author?.name || 'Unknown',
-    publishedAt: featuredArticles[0].datePublished,
-    category: featuredArticles[0].category || 'News',
-    imageUrl: featuredArticles[0].coverImage,
-    slug: featuredArticles[0].slug?.current || featuredArticles[0].slug
+  // Get articles from mock data
+  const featuredArticle = mockNewsPosts.find(post => post.slug === "bitcoin-surges-philippine-adoption");
+  const ethereumArticle = mockNewsPosts.find(post => post.slug === "ethereum-gas-fees-drop");
+  const bspArticle = mockNewsPosts.find(post => post.slug === "bsp-cbdc-guidelines-2025");
+  const tradingVolumeArticle = mockNewsPosts.find(post => post.slug === "philippines-crypto-trading-volume-record");
+
+  // Transform articles to match hero section format
+  const transformedFeaturedArticle = featuredArticle ? {
+    id: featuredArticle.id,
+    title: featuredArticle.title,
+    excerpt: featuredArticle.description,
+    author: featuredArticle.author.name,
+    publishedAt: featuredArticle.datePublished,
+    category: featuredArticle.category,
+    imageUrl: featuredArticle.coverImage,
+    slug: featuredArticle.slug
   } : null;
 
-  const secondaryArticles = featuredArticles.slice(1, 4).map(article => ({
-    id: article._id,
+  const secondaryArticles = [bspArticle, ethereumArticle].filter((article): article is NonNullable<typeof article> => Boolean(article)).map(article => ({
+    id: article.id,
     title: article.title,
-    excerpt: article.excerpt || article.description,
-    author: article.author?.name || 'Unknown',
+    excerpt: article.description,
+    author: article.author.name,
     publishedAt: article.datePublished,
-    category: article.category || 'News',
+    category: article.category,
     imageUrl: article.coverImage,
-    slug: article.slug?.current || article.slug
+    slug: article.slug
   }));
+
+  const transformedThirdArticle = tradingVolumeArticle ? {
+    id: tradingVolumeArticle.id,
+    title: tradingVolumeArticle.title,
+    excerpt: tradingVolumeArticle.description,
+    author: tradingVolumeArticle.author.name,
+    publishedAt: tradingVolumeArticle.datePublished,
+    category: tradingVolumeArticle.category,
+    imageUrl: tradingVolumeArticle.coverImage,
+    slug: tradingVolumeArticle.slug
+  } : null;
 
   // Transform crypto data to match hero section format
   const heroTickers = priceTickers.slice(0, 6).map((ticker) => ({
@@ -61,9 +75,9 @@ export default function ClientHomePage({ featuredArticles, allArticles }: Client
       {/* Hero News Section with Enhanced Spacing */}
       <section className="w-full bg-gradient-to-b from-[var(--color-background-site)] to-[var(--color-surface)] py-4">
         {transformedFeaturedArticle && (
-          <HeroNewsSection
+          <HeroNewsSection 
             featuredArticle={transformedFeaturedArticle}
-            secondaryArticles={secondaryArticles}
+            secondaryArticles={transformedThirdArticle ? [...secondaryArticles, transformedThirdArticle] : secondaryArticles}
             priceTickers={heroTickers}
           />
         )}
