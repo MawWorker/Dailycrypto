@@ -27,13 +27,29 @@ export function urlFor(source: any) {
 }
 
 export function getImageUrl(source: any, fallback: string = ''): string {
-  if (!source) return fallback
+  if (!source) {
+    return fallback
+  }
 
-  if (source.secure_url) return source.secure_url
-  if (source.url) return source.url
+  if (typeof source === 'string') {
+    return source
+  }
+
+  if (source.asset?.url) {
+    return source.asset.url
+  }
+
+  if (source.secure_url) {
+    return source.secure_url
+  }
+
+  if (source.url) {
+    return source.url
+  }
 
   try {
-    return builder.image(source).url()
+    const url = builder.image(source).url()
+    return url
   } catch (error) {
     console.error('Error building image URL:', error)
     return fallback

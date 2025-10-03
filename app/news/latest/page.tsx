@@ -5,6 +5,7 @@ import { LatestNewsContent } from '@/components/news/latest-news-content';
 import { RecommendedArticlesSidebar } from '@/components/news/recommended-articles-sidebar';
 import MarketTicker from '@/components/crypto/market-ticker';
 import { getPublishedArticlesByCategory } from '@/lib/sanity-queries';
+import { getImageUrl } from '@/lib/sanity';
 
 export const metadata = {
   title: 'Latest Crypto News - All News | DailyCrypto',
@@ -13,6 +14,11 @@ export const metadata = {
 
 export default async function LatestNewsPage() {
   const articles = await getPublishedArticlesByCategory('Latest Crypto News');
+
+  const transformedArticles = articles.map(article => ({
+    ...article,
+    coverImage: getImageUrl(article.coverImage, '/placeholder.jpg')
+  }));
 
   return (
     <div className="min-h-screen bg-[var(--color-background-site)]">
@@ -23,7 +29,7 @@ export default async function LatestNewsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content - 3 columns */}
           <div className="lg:col-span-3">
-            <LatestNewsContent articles={articles} />
+            <LatestNewsContent articles={transformedArticles} />
           </div>
 
           {/* Sidebar - 1 column */}

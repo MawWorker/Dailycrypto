@@ -1,18 +1,17 @@
-'use client';
+"use client"
 
-import { useState, useEffect } from 'react';
-import { formatRelativeTime } from '@/lib/format';
+import { useEffect, useState } from "react"
+import { formatDistanceToNow } from "date-fns"
 
-interface ClientRelativeTimeProps {
-  date: string;
-}
-
-export function ClientRelativeTime({ date }: ClientRelativeTimeProps) {
-  const [timeString, setTimeString] = useState('');
+export function ClientRelativeTime({ date }: { date: string | Date }) {
+  const [timeAgo, setTimeAgo] = useState<string>("")
 
   useEffect(() => {
-    setTimeString(formatRelativeTime(date));
-  }, [date]);
+    const dateObj = typeof date === "string" ? new Date(date) : date
+    setTimeAgo(formatDistanceToNow(dateObj, { addSuffix: true }))
+  }, [date])
 
-  return <span>{timeString}</span>;
+  if (!timeAgo) return null
+
+  return <>{timeAgo}</>
 }
