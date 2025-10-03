@@ -6,7 +6,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatRelativeTime } from '@/lib/format';
 import { Clock, User } from 'lucide-react';
-import { getNewsPosts, getImageUrl } from '@/lib/sanity';
+import { getImageUrl } from '@/lib/sanity';
+import { getPublishedArticles, getDebugInfo } from '@/lib/sanity-queries';
 
 export const metadata = {
   title: 'Crypto News Philippines',
@@ -19,30 +20,14 @@ export default async function NewsPage() {
   let debugInfo: any = null;
 
   try {
-    posts = await getNewsPosts();
-
-    const { client } = await import('@/lib/sanity');
-    const allPostsQuery = '*[_type == "newsPost"]{ _id, title }';
-    const allPosts = await client.fetch(allPostsQuery);
-
-    debugInfo = {
-      totalPosts: allPosts?.length || 0,
-      publishedPosts: posts?.length || 0,
-      sampleIds: allPosts?.slice(0, 3).map((p: any) => ({ id: p._id, title: p.title })) || [],
-    };
+    posts = await getPublishedArticles();
+    debugInfo = await getDebugInfo();
   } catch (e: any) {
     error = e.message;
     posts = [];
   }
 
-  const sanityConfig = {
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'uiu9mgqs',
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
-    apiVersion: process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-01-01',
-  };
-
   console.log('News posts fetched:', posts?.length || 0);
-  console.log('Sanity config:', sanityConfig);
   console.log('Debug info:', debugInfo);
   if (error) console.error('Fetch error:', error);
 
@@ -64,14 +49,53 @@ export default async function NewsPage() {
                 <p className="font-mono">{error}</p>
               </div>
             )}
-            <div className="text-xs text-muted-foreground bg-muted p-4 rounded-lg max-w-2xl mx-auto">
-              <p className="font-semibold mb-2">Sanity Configuration:</p>
-              <pre className="text-left">{JSON.stringify(sanityConfig, null, 2)}</pre>
-            </div>
             {debugInfo && (
-              <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 p-4 rounded-lg max-w-2xl mx-auto border border-blue-200 dark:border-blue-800">
-                <p className="font-semibold mb-2 text-blue-700 dark:text-blue-300">Debug Information:</p>
-                <pre className="text-left">{JSON.stringify(debugInfo, null, 2)}</pre>
+              <div className="space-y-4">
+                <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 p-4 rounded-lg max-w-2xl mx-auto border border-blue-200 dark:border-blue-800">
+                  <p className="font-semibold mb-2 text-blue-700 dark:text-blue-300">📊 Debug Information:</p>
+                  <div className="text-left space-y-2">
+                    <div className="p-2 bg-white dark:bg-gray-900 rounded">
+                      <p className="font-semibold">Total Documents: <span className="text-blue-600">{debugInfo.totalDocuments}</span></p>
+                      <p className="font-semibold">Published Documents: <span className="text-green-600">{debugInfo.publishedDocuments}</span></p>
+                      <p className="font-semibold">Draft Documents: <span className="text-orange-600">{debugInfo.draftDocuments}</span></p>
+                    </div>
+
+                    {debugInfo.sampleDocuments && debugInfo.sampleDocuments.length > 0 && (
+                      <div className="p-2 bg-white dark:bg-gray-900 rounded">
+                        <p className="font-semibold mb-1">Sample Documents:</p>
+                        {debugInfo.sampleDocuments.map((doc: any, idx: number) => (
+                          <div key={idx} className="ml-2 mb-1 text-xs">
+                            <p className="font-mono">
+                              {doc.isDraft ? '🟠 DRAFT' : '🟢 PUBLISHED'} - {doc.id}
+                            </p>
+                            <p className="text-gray-600 dark:text-gray-400">{doc.title}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="p-2 bg-white dark:bg-gray-900 rounded">
+                      <p className="font-semibold mb-1">Sanity Config:</p>
+                      <pre className="text-xs">{JSON.stringify(debugInfo.config, null, 2)}</pre>
+                    </div>
+                  </div>
+                </div>
+
+                {debugInfo.draftDocuments > 0 && (
+                  <div className="text-sm bg-orange-50 dark:bg-orange-950 p-4 rounded-lg max-w-2xl mx-auto border border-orange-200 dark:border-orange-800">
+                    <p className="font-semibold mb-2 text-orange-700 dark:text-orange-300">⚠️ Action Required:</p>
+                    <p className="text-orange-900 dark:text-orange-100">
+                      You have <strong>{debugInfo.draftDocuments} draft document(s)</strong>.
+                      To make them visible on the live site:
+                    </p>
+                    <ol className="list-decimal ml-5 mt-2 space-y-1 text-orange-900 dark:text-orange-100">
+                      <li>Open Sanity Studio</li>
+                      <li>Select the draft article</li>
+                      <li>Click the green <strong>"Publish"</strong> button (not just Save)</li>
+                      <li>Refresh this page</li>
+                    </ol>
+                  </div>
+                )}
               </div>
             )}
           </div>
