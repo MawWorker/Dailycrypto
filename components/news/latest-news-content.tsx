@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Filter, Grid3X3, List, Search, Clock, User, Eye, Heart, MessageCircle, Share2, Bookmark, TrendingUp, TrendingDown, Zap, Star, Tag, ChevronRight, RefreshCw, Flame, Newspaper } from 'lucide-react';
+import { Filter, Grid3x3 as Grid3X3, List, Search, Clock, User, Eye, Heart, MessageCircle, Share2, Bookmark, TrendingUp, TrendingDown, Zap, Star, Tag, ChevronRight, RefreshCw, Flame, Newspaper } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
