@@ -7,12 +7,7 @@ export async function getPublishedArticles() {
     slug,
     description,
     excerpt,
-    coverImage {
-      asset->{
-        _id,
-        url
-      }
-    },
+    coverImage,
     "author": author->{
       name,
       bio,
@@ -52,12 +47,7 @@ export async function getPublishedArticleBySlug(slug: string) {
     description,
     excerpt,
     content,
-    coverImage {
-      asset->{
-        _id,
-        url
-      }
-    },
+    coverImage,
     "author": author->{
       name,
       bio,
@@ -97,12 +87,7 @@ export async function getFeaturedPublishedArticles(limit: number = 3) {
     slug,
     description,
     excerpt,
-    coverImage {
-      asset->{
-        _id,
-        url
-      }
-    },
+    coverImage,
     "author": author->{
       name,
       bio,
@@ -134,12 +119,7 @@ export async function getPublishedArticlesByCategory(categoryName: string, limit
     slug,
     description,
     excerpt,
-    coverImage {
-      asset->{
-        _id,
-        url
-      }
-    },
+    coverImage,
     "author": author->{
       name,
       bio,
