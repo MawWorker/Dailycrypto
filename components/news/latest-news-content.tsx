@@ -8,10 +8,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { latestNewsData } from '@/lib/latest-news-data';
 import { cn } from '@/lib/utils';
 import { ClientRelativeTime } from '@/components/ui/client-relative-time';
 import { ClientStaticDateFormatter } from '@/components/ui/client-static-date-formatter';
+
+interface LatestNewsContentProps {
+  articles: any[];
+}
 
 type ViewMode = 'magazine' | 'grid' | 'list';
 
@@ -46,7 +49,7 @@ const articleEngagementData: Record<string, ArticleEngagement> = {
   'small-16': { views: '21.9K', likes: '1.8K', shares: '1.0K', comments: '334' }
 };
 
-export function LatestNewsContent() {
+export function LatestNewsContent({ articles }: LatestNewsContentProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('magazine');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -57,11 +60,19 @@ export function LatestNewsContent() {
     setLastUpdated(new Date());
   }, []);
 
-  const { featuredArticles, smallArticles } = latestNewsData;
-  const allArticles = [...featuredArticles, ...smallArticles];
+  const transformedArticles = articles.map(article => ({
+    id: article._id,
+    title: article.title,
+    slug: article.slug?.current || article.slug,
+    excerpt: article.excerpt || article.description,
+    coverImage: article.coverImage,
+    author: { name: article.author?.name || 'Unknown' },
+    datePublished: article.datePublished,
+    category: article.category || 'News',
+    readingTime: article.readingTime || 3
+  }));
 
-  // Sort articles by newest first
-  const filteredAndSortedArticles = allArticles.sort((a, b) => 
+  const filteredAndSortedArticles = transformedArticles.sort((a, b) =>
     new Date(b.datePublished).getTime() - new Date(a.datePublished).getTime()
   );
 
@@ -126,7 +137,7 @@ export function LatestNewsContent() {
               LIVE
             </span>
             <Badge variant="secondary" className="rounded-xl">
-              {allArticles.length} stories
+              {articles.length} stories
             </Badge>
           </div>
         </div>
