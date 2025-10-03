@@ -1,47 +1,29 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from 'react';
-import { formatDateTime } from '@/lib/format';
+import { useEffect, useState } from "react"
+import { format } from "date-fns"
 
-interface ClientStaticDateFormatterProps {
-  date: string | Date;
-  className?: string;
-  format?: 'datetime' | 'time' | 'date';
-}
-
-export function ClientStaticDateFormatter({ date, className, format = 'datetime' }: ClientStaticDateFormatterProps) {
-  const [mounted, setMounted] = useState(false);
+export function ClientStaticDateFormatter({
+  date,
+  format: formatStr = "PPP"
+}: {
+  date: string | Date
+  format?: "time" | "date" | "full" | string
+}) {
+  const [formattedDate, setFormattedDate] = useState<string>("")
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const dateObj = typeof date === "string" ? new Date(date) : date
 
-  if (!mounted) {
-    return <span className={className}>Loading...</span>;
-  }
+    let formatString = formatStr
+    if (formatStr === "time") formatString = "p"
+    if (formatStr === "date") formatString = "PP"
+    if (formatStr === "full") formatString = "PPpp"
 
-  const formatDate = (dateInput: string | Date) => {
-    const dateObj = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
-    
-    switch (format) {
-      case 'time':
-        return dateObj.toLocaleTimeString('en-PH', { 
-          timeZone: 'Asia/Manila',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        });
-      case 'date':
-        return dateObj.toLocaleDateString('en-PH', {
-          timeZone: 'Asia/Manila',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
-      default:
-        return formatDateTime(dateInput);
-    }
-  };
+    setFormattedDate(format(dateObj, formatString))
+  }, [date, formatStr])
 
-  return <span className={className}>{formatDate(date)}</span>;
+  if (!formattedDate) return null
+
+  return <>{formattedDate}</>
 }
